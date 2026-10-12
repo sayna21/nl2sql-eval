@@ -1,0 +1,44 @@
+# Column descriptions used by GET /schema and by the S2 prompt.
+# Counts under data_quality were measured on the 250,000-row sample (seed 42).
+
+tables:
+  trips:
+    description: One row per yellow-taxi trip.
+    columns:
+      trip_id: Surrogate key, 1..N in sample order.
+      vendor_id: Meter vendor (1 = Creative Mobile Technologies, 2 = Curb/VeriFone, 6 = Myle).
+      pickup_at: Meter-on time as text 'YYYY-MM-DD HH:MM:SS', local NYC time. Use strftime/julianday on it.
+      dropoff_at: Meter-off time as text 'YYYY-MM-DD HH:MM:SS', local NYC time.
+      passenger_count: Driver-entered passenger count. NULL when not recorded; 0 also occurs.
+      trip_distance_mi: Trip distance in miles from the meter.
+      rate_code_id: Rate code (1 = standard, 2 = JFK flat fare, 3 = Newark, 4 = Nassau/Westchester, 5 = negotiated, 6 = group ride, 99 = unknown). NULL when not recorded.
+      pu_zone_id: Pick-up taxi zone; joins to zones.zone_id.
+      do_zone_id: Drop-off taxi zone; joins to zones.zone_id.
+      payment_type: Payment code; joins to payment_types.code.
+      fare_amount: Time-and-distance fare in USD. Negative on refunded or disputed trips.
+      tip_amount: Tip in USD. Recorded for card payments only; cash tips are not captured.
+      tolls_amount: Tolls in USD.
+      congestion_surcharge: NY State congestion surcharge in USD (usually 2.50 or 0).
+      airport_fee: Airport pick-up fee in USD (1.75 at JFK and LaGuardia, otherwise 0).
+      total_amount: Total charged to the passenger in USD, excluding cash tips.
+  zones:
+    description: TLC taxi zone lookup.
+    columns:
+      zone_id: Zone key (1..265).
+      borough: Manhattan, Brooklyn, Queens, Bronx, Staten Island, EWR, or Unknown / N/A.
+      zone: Zone name, e.g. 'JFK Airport', 'LaGuardia Airport', 'Newark Airport', 'Midtown Center'.
+      service_zone: Yellow Zone, Boro Zone, Airports, EWR or N/A.
+  payment_types:
+    description: Payment code lookup.
+    columns:
+      code: 0 = Flex Fare trip, 1 = Credit card, 2 = Cash, 3 = No charge, 4 = Dispute, 5 = Unknown, 6 = Voided trip.
+      name: Human-readable payment name.
+
+data_quality:
+  - The data is January 2024. 2 trips have a pickup_at outside January 2024 (one as far back as 2002).
+  - 3,150 trips have a negative fare_amount (refunds and disputes); their surcharges are negative too.
+  - 5,153 trips have trip_distance_mi = 0, and a few distances are impossibly large (max 97,793 miles).
+  - 8 trips have dropoff_at earlier than pickup_at, which gives a negative duration.
+  - 11,818 trips (payment_type 0) have NULL passenger_count, rate_code_id, congestion_surcharge and airport_fee.
+  - 2,679 trips have passenger_count = 0.
+  - Zones 264 and 265 are placeholders for unknown and out-of-city locations.

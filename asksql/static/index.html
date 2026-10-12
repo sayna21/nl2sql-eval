@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AskSQL</title>
+<style>
+  :root { color-scheme: light; --ink: #152b31; --muted: #547078; --line: #d9e5e3; --accent: #087f73; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem; color: var(--ink); background: #f4f8f7; }
+  header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 1.4rem; margin-bottom: 3rem; }
+  .brand { font-weight: 800; letter-spacing: -.04em; font-size: 1.5rem; }
+  .badge { font-size: .8rem; color: var(--accent); background: #e0f0ea; border-radius: 2rem; padding: .4rem .8rem; }
+  h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.1; letter-spacing: -.055em; margin: 0 0 1rem; max-width: 750px; }
+  p.sub { color: var(--muted); line-height: 1.6; max-width: 680px; margin-bottom: 2rem; }
+  .workspace { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 1.5rem; box-shadow: 0 12px 36px #152b3108; }
+  label { display: block; font-size: .8rem; font-weight: 650; margin-bottom: .5rem; color: var(--muted); }
+  form { display: flex; flex-wrap: wrap; gap: .7rem; margin: .5rem 0 1rem; }
+  input[type=text] { flex: 1 1 330px; min-width: 0; padding: .9rem; font-size: 1rem; border: 1px solid var(--line); border-radius: 8px; }
+  select, button { padding: .8rem 1rem; font-size: .9rem; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  button { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; font-weight: 600; }
+  button:hover { filter: brightness(.95); }
+  button:disabled { opacity: .55; cursor: wait; }
+  :focus-visible { outline: 3px solid #80c8bb; outline-offset: 3px; }
+  pre { background: #142f35; color: #d2eee5; padding: 1.1rem; border-radius: 10px; overflow-x: auto; white-space: pre-wrap; font-size: .85rem; line-height: 1.65; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: .7rem 1rem; text-align: left; white-space: nowrap; }
+  th { background: #eef5f3; font-weight: 650; }
+  tr:last-child td { border-bottom: 0; }
+  .meta, footer { color: var(--muted); font-size: .8rem; line-height: 1.6; }
+  .blocked { background: #fff4eb; border: 1px solid #f0d2b6; padding: 1rem; border-radius: 8px; }
+  .examples button { background: #f4f8f7; border-color: var(--line); color: var(--muted); font-size: .75rem; padding: .45rem .65rem; margin: 0 .35rem .45rem 0; font-weight: 500; }
+  #output { min-height: 130px; margin-top: 1.5rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  details { margin-top: 1.5rem; padding: 1rem 0; color: var(--muted); font-size: .85rem; }
+  summary { cursor: pointer; font-weight: 600; }
+  #schema { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  #schema p { line-height: 1.6; }
+  footer { margin-top: 1.2rem; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  a { color: var(--accent); }
+  @media (max-width: 600px) { body { padding: 1.5rem 1rem; } header { margin-bottom: 2rem; } .workspace { padding: 1rem; } select { flex: 1; } }
+</style>
+</head>
+<body>
+<header><span class="brand">AskSQL<span style="color:var(--accent)">.</span></span><span class="badge">Read-only analytics</span></header>
+<main>
+<h1>Your questions.<br>New York's taxi data.</h1>
+<p class="sub">Explore trips, fares, and pickup patterns in plain English. Inspect the generated SQL and the results, with every query checked before execution.</p>
+<section class="workspace" aria-label="Query workspace">
+<label for="question">What would you like to know?</label>
+<form id="form">
+  <input type="text" id="question" maxlength="500" placeholder="Which 5 pickup zones had the most trips?" required>
+  <select id="strategy" aria-label="Prompt strategy">
+    <option value="s2">S2: descriptions + examples</option>
+    <option value="s1">S1: schema only</option>
+  </select>
+  <button id="go" type="submit">Ask</button>
+</form>
+<div class="examples" id="examples"></div>
+
+<div id="output" aria-live="polite" aria-busy="false"><p class="meta">Choose an example or ask a question to explore the database.</p></div>
+<details><summary>Explore the available schema</summary><div id="schema"></div></details>
+</section>
+<footer><span>Bounded queries · Read-only database · Execution timeout</span><a href="/docs">API reference ↗</a></footer>
+</main>
+
+<script>
+const examples = [
+  "Which 5 pickup zones had the most trips?",
+  "What is the average tip on trips picked up at JFK Airport?",
+  "How many trips started in each hour of the day?",
+  "Drop the trips table."
+];
+const form = document.getElementById("form");
+const question = document.getElementById("question");
+const output = document.getElementById("output");
+const go = document.getElementById("go");
+
+for (const text of examples) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = text;
+  b.onclick = () => { if (go.disabled) return; question.value = text; form.requestSubmit(); };
+  document.getElementById("examples").appendChild(b);
+}
+
+function el(tag, text, cls) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (cls) node.className = cls;
+  return node;
+}
+
+function render(data) {
+  output.replaceChildren();
+  output.appendChild(el("h3", "SQL"));
+  output.appendChild(el("pre", data.sql || "(no SQL produced)"));
+  if (data.blocked_reason) {
+    output.appendChild(el("div", "Blocked by the guard: " + data.blocked_reason, "blocked"));
+  } else if (data.error) {
+    output.appendChild(el("div", "Failed: " + data.error, "blocked"));
+  } else {
+    const table = el("table");
+    const head = el("tr");
+    for (const c of data.columns) head.appendChild(el("th", c));
+    table.appendChild(head);
+    for (const row of data.rows) {
+      const tr = el("tr");
+      for (const cell of row) tr.appendChild(el("td", cell === null ? "NULL" : String(cell)));
+      table.appendChild(tr);
+    }
+    output.appendChild(el("h3", "Result"));
+    const wrap = el("div", undefined, "table-wrap");
+    wrap.appendChild(table);
+    output.appendChild(wrap);
+    if (!data.rows.length) output.appendChild(el("p", "No rows matched this question.", "meta"));
+    if (data.row_count > data.rows.length) output.appendChild(el("p",
+      `Showing ${data.rows.length} of ${data.row_count} returned rows.`, "meta"));
+  }
+  output.appendChild(el("p",
+    `${data.row_count} row(s), ${data.attempts} attempt(s), ${Math.round(data.latency_ms)} ms`, "meta"));
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (go.disabled) return;
+  go.disabled = true;
+  output.setAttribute("aria-busy", "true");
+  output.replaceChildren(el("p", "Thinking...", "meta"));
+  try {
+    const response = await fetch("/ask", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: question.value, strategy: document.getElementById("strategy").value})
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      const detail = Array.isArray(data.detail) ? data.detail.map(item => item.msg).join("; ") : data.detail;
+      throw new Error(detail || response.statusText);
+    }
+    render(data);
+  } catch (err) {
+    output.replaceChildren(el("div", "Request failed: " + err.message, "blocked"));
+  } finally {
+    go.disabled = false;
+    output.setAttribute("aria-busy", "false");
+  }
+});
+fetch("/schema").then(response => {
+  if (!response.ok) throw new Error("Schema unavailable");
+  return response.json();
+}).then(data => {
+  const schema = document.getElementById("schema");
+  for (const table of data.tables) {
+    const section = el("section");
+    section.appendChild(el("h3", table.name));
+    section.appendChild(el("p", table.description));
+    section.appendChild(el("p", table.columns.map(column => column.name).join(" · "), "meta"));
+    schema.appendChild(section);
+  }
+}).catch(() => document.getElementById("schema").appendChild(el("p", "The schema is currently unavailable.")));
+</script>
+</body>
+</html>

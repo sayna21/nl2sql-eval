@@ -1,0 +1,1632 @@
+{
+  "reviewer": "Codex",
+  "verification_method": "automated",
+  "method": "Semantic review plus independent Python calculations over raw database rows; float comparisons at two decimals, matching the evaluation contract.",
+  "human_verified": false,
+  "verified_at": "2026-10-11T20:00:10+00:00",
+  "database_sha256_before": "d9325da905992680e530d8d40b16dd71f5f36439d69545c37e1a78835b336c78",
+  "database_sha256_after": "d9325da905992680e530d8d40b16dd71f5f36439d69545c37e1a78835b336c78",
+  "questions_sha256": "9118e5c379019513751932de6a37bb42f79985785b36fc425eb13658a8b8eb1e",
+  "n": 40,
+  "passed": 40,
+  "items": [
+    {
+      "id": "f01",
+      "passed": true,
+      "question": "How many trips are in the dataset?",
+      "gold_sql": "SELECT COUNT(*) FROM trips",
+      "expected_rows": [
+        [
+          250000
+        ]
+      ],
+      "actual_rows": [
+        [
+          250000
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f02",
+      "passed": true,
+      "question": "How many trips were paid in cash?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE payment_type = 2",
+      "expected_rows": [
+        [
+          36733
+        ]
+      ],
+      "actual_rows": [
+        [
+          36733
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f03",
+      "passed": true,
+      "question": "What is the average fare amount for trips longer than 10 miles?",
+      "gold_sql": "SELECT AVG(fare_amount) FROM trips WHERE trip_distance_mi > 10",
+      "expected_rows": [
+        [
+          62.53405074410913
+        ]
+      ],
+      "actual_rows": [
+        [
+          62.53405074410913
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f04",
+      "passed": true,
+      "question": "What is the total tip amount collected on trips paid by credit card?",
+      "gold_sql": "SELECT SUM(tip_amount) FROM trips WHERE payment_type = 1",
+      "expected_rows": [
+        [
+          815624.1900000001
+        ]
+      ],
+      "actual_rows": [
+        [
+          815624.1900000001
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f05",
+      "passed": true,
+      "question": "How many trips had more than 4 passengers?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE passenger_count > 4",
+      "expected_rows": [
+        [
+          4657
+        ]
+      ],
+      "actual_rows": [
+        [
+          4657
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f06",
+      "passed": true,
+      "question": "What is the largest tip amount on any single trip?",
+      "gold_sql": "SELECT MAX(tip_amount) FROM trips",
+      "expected_rows": [
+        [
+          110.0
+        ]
+      ],
+      "actual_rows": [
+        [
+          110.0
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f07",
+      "passed": true,
+      "question": "How many trips had a tolls amount greater than zero?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE tolls_amount > 0",
+      "expected_rows": [
+        [
+          17660
+        ]
+      ],
+      "actual_rows": [
+        [
+          17660
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f08",
+      "passed": true,
+      "question": "What is the average trip distance in miles for trips with exactly 1 passenger?",
+      "gold_sql": "SELECT AVG(trip_distance_mi) FROM trips WHERE passenger_count = 1",
+      "expected_rows": [
+        [
+          3.1183841554154608
+        ]
+      ],
+      "actual_rows": [
+        [
+          3.1183841554154608
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f09",
+      "passed": true,
+      "question": "How many trips had a total amount between 50 and 100 dollars, inclusive?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE total_amount BETWEEN 50 AND 100",
+      "expected_rows": [
+        [
+          23556
+        ]
+      ],
+      "actual_rows": [
+        [
+          23556
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "f10",
+      "passed": true,
+      "question": "What percentage of trips paid by credit card had a tip greater than zero? Express percentages on a 0 to 100 scale.",
+      "gold_sql": "SELECT 100.0 * SUM(CASE WHEN tip_amount > 0 THEN 1 ELSE 0 END) / COUNT(*) FROM trips WHERE payment_type = 1",
+      "expected_rows": [
+        [
+          95.044313749515
+        ]
+      ],
+      "actual_rows": [
+        [
+          95.044313749515
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "g01",
+      "passed": true,
+      "question": "How many trips are there for each payment type code? Return the payment type code and the number of trips.",
+      "gold_sql": "SELECT payment_type, COUNT(*) FROM trips GROUP BY payment_type",
+      "expected_rows": [
+        [
+          1,
+          195876
+        ],
+        [
+          2,
+          36733
+        ],
+        [
+          4,
+          3950
+        ],
+        [
+          3,
+          1623
+        ],
+        [
+          0,
+          11818
+        ]
+      ],
+      "actual_rows": [
+        [
+          0,
+          11818
+        ],
+        [
+          1,
+          195876
+        ],
+        [
+          2,
+          36733
+        ],
+        [
+          3,
+          1623
+        ],
+        [
+          4,
+          3950
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g02",
+      "passed": true,
+      "question": "What are the 5 pickup zone IDs with the most trips? Return the zone ID and the number of trips, most trips first. Break ties by pickup zone ID ascending.",
+      "gold_sql": "SELECT pu_zone_id, COUNT(*) AS trips FROM trips GROUP BY pu_zone_id ORDER BY trips DESC, pu_zone_id ASC LIMIT 5",
+      "expected_rows": [
+        [
+          132,
+          12221
+        ],
+        [
+          161,
+          12083
+        ],
+        [
+          237,
+          12081
+        ],
+        [
+          236,
+          11591
+        ],
+        [
+          230,
+          8981
+        ]
+      ],
+      "actual_rows": [
+        [
+          132,
+          12221
+        ],
+        [
+          161,
+          12083
+        ],
+        [
+          237,
+          12081
+        ],
+        [
+          236,
+          11591
+        ],
+        [
+          230,
+          8981
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g03",
+      "passed": true,
+      "question": "What is the average fare amount for each passenger count, ignoring trips where the passenger count is missing? Return the passenger count and the average fare.",
+      "gold_sql": "SELECT passenger_count, AVG(fare_amount) FROM trips WHERE passenger_count IS NOT NULL GROUP BY passenger_count",
+      "expected_rows": [
+        [
+          1,
+          17.537293757947996
+        ],
+        [
+          2,
+          20.275141505275222
+        ],
+        [
+          3,
+          20.331238634866253
+        ],
+        [
+          4,
+          21.856520856820744
+        ],
+        [
+          5,
+          17.354031971580817
+        ],
+        [
+          0,
+          19.344038820455395
+        ],
+        [
+          6,
+          16.769880174291938
+        ],
+        [
+          8,
+          86.0
+        ]
+      ],
+      "actual_rows": [
+        [
+          0,
+          19.344038820455395
+        ],
+        [
+          1,
+          17.537293757947996
+        ],
+        [
+          2,
+          20.275141505275222
+        ],
+        [
+          3,
+          20.331238634866253
+        ],
+        [
+          4,
+          21.856520856820744
+        ],
+        [
+          5,
+          17.354031971580817
+        ],
+        [
+          6,
+          16.769880174291938
+        ],
+        [
+          8,
+          86.0
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g04",
+      "passed": true,
+      "question": "Which vendor IDs have more than 1000 trips? Return the vendor ID and the number of trips.",
+      "gold_sql": "SELECT vendor_id, COUNT(*) FROM trips GROUP BY vendor_id HAVING COUNT(*) > 1000",
+      "expected_rows": [
+        [
+          2,
+          188617
+        ],
+        [
+          1,
+          61361
+        ]
+      ],
+      "actual_rows": [
+        [
+          1,
+          61361
+        ],
+        [
+          2,
+          188617
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g05",
+      "passed": true,
+      "question": "What is the total revenue (sum of total amount) for each vendor? Return the vendor ID and the revenue, highest revenue first. Break ties by vendor ID ascending.",
+      "gold_sql": "SELECT vendor_id, SUM(total_amount) AS revenue FROM trips GROUP BY vendor_id ORDER BY revenue DESC, vendor_id ASC",
+      "expected_rows": [
+        [
+          2,
+          5118583.37
+        ],
+        [
+          1,
+          1589834.68
+        ],
+        [
+          6,
+          1000.8299999999999
+        ]
+      ],
+      "actual_rows": [
+        [
+          2,
+          5118583.37
+        ],
+        [
+          1,
+          1589834.68
+        ],
+        [
+          6,
+          1000.8299999999999
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g06",
+      "passed": true,
+      "question": "Among drop-off zones with at least 500 drop-offs, which 3 zone IDs have the highest average tip amount? Return the zone ID and the average tip, highest first. Break ties by drop-off zone ID ascending.",
+      "gold_sql": "SELECT do_zone_id, AVG(tip_amount) AS avg_tip FROM trips GROUP BY do_zone_id HAVING COUNT(*) >= 500 ORDER BY avg_tip DESC, do_zone_id ASC LIMIT 3",
+      "expected_rows": [
+        [
+          1,
+          14.52841166936791
+        ],
+        [
+          265,
+          10.976477272727273
+        ],
+        [
+          132,
+          9.179481825212683
+        ]
+      ],
+      "actual_rows": [
+        [
+          1,
+          14.52841166936791
+        ],
+        [
+          265,
+          10.976477272727273
+        ],
+        [
+          132,
+          9.179481825212683
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g07",
+      "passed": true,
+      "question": "What is the average tip amount for each payment type code? Return the payment type code and the average tip.",
+      "gold_sql": "SELECT payment_type, AVG(tip_amount) FROM trips GROUP BY payment_type",
+      "expected_rows": [
+        [
+          1,
+          4.163982264289653
+        ],
+        [
+          2,
+          0.0015525549233659107
+        ],
+        [
+          4,
+          0.04761518987341772
+        ],
+        [
+          3,
+          0.009168207024029575
+        ],
+        [
+          0,
+          1.5720807243188355
+        ]
+      ],
+      "actual_rows": [
+        [
+          0,
+          1.5720807243188355
+        ],
+        [
+          1,
+          4.163982264289653
+        ],
+        [
+          2,
+          0.0015525549233659107
+        ],
+        [
+          3,
+          0.009168207024029575
+        ],
+        [
+          4,
+          0.04761518987341772
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g08",
+      "passed": true,
+      "question": "How many trips were there for each passenger count from 1 to 6? Return the passenger count and the number of trips, ordered by passenger count ascending.",
+      "gold_sql": "SELECT passenger_count, COUNT(*) FROM trips WHERE passenger_count BETWEEN 1 AND 6 GROUP BY passenger_count ORDER BY passenger_count",
+      "expected_rows": [
+        [
+          1,
+          184795
+        ],
+        [
+          2,
+          34027
+        ],
+        [
+          3,
+          7589
+        ],
+        [
+          4,
+          4435
+        ],
+        [
+          5,
+          2815
+        ],
+        [
+          6,
+          1836
+        ]
+      ],
+      "actual_rows": [
+        [
+          1,
+          184795
+        ],
+        [
+          2,
+          34027
+        ],
+        [
+          3,
+          7589
+        ],
+        [
+          4,
+          4435
+        ],
+        [
+          5,
+          2815
+        ],
+        [
+          6,
+          1836
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g09",
+      "passed": true,
+      "question": "What is the maximum fare amount for each vendor? Return the vendor ID and the maximum fare.",
+      "gold_sql": "SELECT vendor_id, MAX(fare_amount) FROM trips GROUP BY vendor_id",
+      "expected_rows": [
+        [
+          2,
+          700.0
+        ],
+        [
+          1,
+          5000.0
+        ],
+        [
+          6,
+          73.17
+        ]
+      ],
+      "actual_rows": [
+        [
+          1,
+          5000.0
+        ],
+        [
+          2,
+          700.0
+        ],
+        [
+          6,
+          73.17
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "g10",
+      "passed": true,
+      "question": "Which 10 pickup zone IDs have the highest total tolls amount? Return the zone ID and the total tolls, highest first. Break ties by pickup zone ID ascending.",
+      "gold_sql": "SELECT pu_zone_id, SUM(tolls_amount) AS total_tolls FROM trips GROUP BY pu_zone_id ORDER BY total_tolls DESC, pu_zone_id ASC LIMIT 10",
+      "expected_rows": [
+        [
+          132,
+          40219.03
+        ],
+        [
+          138,
+          34111.700000000004
+        ],
+        [
+          230,
+          5560.2300000000005
+        ],
+        [
+          70,
+          4980.06
+        ],
+        [
+          161,
+          3755.9900000000002
+        ],
+        [
+          162,
+          2321.4900000000002
+        ],
+        [
+          163,
+          2173.38
+        ],
+        [
+          170,
+          2133.4700000000003
+        ],
+        [
+          164,
+          2037.14
+        ],
+        [
+          186,
+          1967.21
+        ]
+      ],
+      "actual_rows": [
+        [
+          132,
+          40219.03
+        ],
+        [
+          138,
+          34111.700000000004
+        ],
+        [
+          230,
+          5560.2300000000005
+        ],
+        [
+          70,
+          4980.06
+        ],
+        [
+          161,
+          3755.9900000000002
+        ],
+        [
+          162,
+          2321.4900000000002
+        ],
+        [
+          163,
+          2173.38
+        ],
+        [
+          170,
+          2133.4700000000003
+        ],
+        [
+          164,
+          2037.14
+        ],
+        [
+          186,
+          1967.21
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "j01",
+      "passed": true,
+      "question": "How many trips were picked up in each borough? Return the borough and the number of trips.",
+      "gold_sql": "SELECT z.borough, COUNT(*) FROM trips t JOIN zones z ON z.zone_id = t.pu_zone_id GROUP BY z.borough",
+      "expected_rows": [
+        [
+          "Manhattan",
+          223123
+        ],
+        [
+          "Brooklyn",
+          2131
+        ],
+        [
+          "N/A",
+          144
+        ],
+        [
+          "Queens",
+          23130
+        ],
+        [
+          "Bronx",
+          580
+        ],
+        [
+          "Unknown",
+          864
+        ],
+        [
+          "EWR",
+          22
+        ],
+        [
+          "Staten Island",
+          6
+        ]
+      ],
+      "actual_rows": [
+        [
+          "Bronx",
+          580
+        ],
+        [
+          "Brooklyn",
+          2131
+        ],
+        [
+          "EWR",
+          22
+        ],
+        [
+          "Manhattan",
+          223123
+        ],
+        [
+          "N/A",
+          144
+        ],
+        [
+          "Queens",
+          23130
+        ],
+        [
+          "Staten Island",
+          6
+        ],
+        [
+          "Unknown",
+          864
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "j02",
+      "passed": true,
+      "question": "What are the 5 pickup zones with the most trips? Return the zone name and the number of trips, most trips first. Break ties by pickup zone ID ascending.",
+      "gold_sql": "SELECT z.zone, COUNT(*) AS trips FROM trips t JOIN zones z ON z.zone_id = t.pu_zone_id GROUP BY z.zone_id, z.zone ORDER BY trips DESC, z.zone_id ASC LIMIT 5",
+      "expected_rows": [
+        [
+          "JFK Airport",
+          12221
+        ],
+        [
+          "Midtown Center",
+          12083
+        ],
+        [
+          "Upper East Side South",
+          12081
+        ],
+        [
+          "Upper East Side North",
+          11591
+        ],
+        [
+          "Times Sq/Theatre District",
+          8981
+        ]
+      ],
+      "actual_rows": [
+        [
+          "JFK Airport",
+          12221
+        ],
+        [
+          "Midtown Center",
+          12083
+        ],
+        [
+          "Upper East Side South",
+          12081
+        ],
+        [
+          "Upper East Side North",
+          11591
+        ],
+        [
+          "Times Sq/Theatre District",
+          8981
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "j03",
+      "passed": true,
+      "question": "How many trips were paid with each payment type? Return the payment type name and the number of trips.",
+      "gold_sql": "SELECT p.name, COUNT(*) FROM trips t JOIN payment_types p ON p.code = t.payment_type GROUP BY p.name",
+      "expected_rows": [
+        [
+          "Credit card",
+          195876
+        ],
+        [
+          "Cash",
+          36733
+        ],
+        [
+          "Dispute",
+          3950
+        ],
+        [
+          "No charge",
+          1623
+        ],
+        [
+          "Flex Fare trip",
+          11818
+        ]
+      ],
+      "actual_rows": [
+        [
+          "Cash",
+          36733
+        ],
+        [
+          "Credit card",
+          195876
+        ],
+        [
+          "Dispute",
+          3950
+        ],
+        [
+          "Flex Fare trip",
+          11818
+        ],
+        [
+          "No charge",
+          1623
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "j04",
+      "passed": true,
+      "question": "How many trips were dropped off at JFK Airport?",
+      "gold_sql": "SELECT COUNT(*) FROM trips t JOIN zones z ON z.zone_id = t.do_zone_id WHERE z.zone = 'JFK Airport'",
+      "expected_rows": [
+        [
+          2586
+        ]
+      ],
+      "actual_rows": [
+        [
+          2586
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "j05",
+      "passed": true,
+      "question": "What is the average tip amount on trips picked up at LaGuardia Airport?",
+      "gold_sql": "SELECT AVG(t.tip_amount) FROM trips t JOIN zones z ON z.zone_id = t.pu_zone_id WHERE z.zone = 'LaGuardia Airport'",
+      "expected_rows": [
+        [
+          8.663261268343815
+        ]
+      ],
+      "actual_rows": [
+        [
+          8.663261268343815
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "j06",
+      "passed": true,
+      "question": "How many trips started and ended in the same borough? Treat Unknown-to-Unknown and N/A-to-N/A as the same borough.",
+      "gold_sql": "SELECT COUNT(*) FROM trips t JOIN zones pz ON pz.zone_id = t.pu_zone_id JOIN zones dz ON dz.zone_id = t.do_zone_id WHERE pz.borough = dz.borough",
+      "expected_rows": [
+        [
+          217843
+        ]
+      ],
+      "actual_rows": [
+        [
+          217843
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "j07",
+      "passed": true,
+      "question": "For trips paid in cash, what is the average fare amount by pickup borough? Return the borough and the average fare.",
+      "gold_sql": "SELECT z.borough, AVG(t.fare_amount) FROM trips t JOIN zones z ON z.zone_id = t.pu_zone_id WHERE t.payment_type = 2 GROUP BY z.borough",
+      "expected_rows": [
+        [
+          "Manhattan",
+          14.116312956434149
+        ],
+        [
+          "N/A",
+          82.95
+        ],
+        [
+          "Queens",
+          42.991854945054946
+        ],
+        [
+          "Brooklyn",
+          19.97967032967033
+        ],
+        [
+          "Bronx",
+          17.901041666666668
+        ],
+        [
+          "Unknown",
+          18.256037735849056
+        ],
+        [
+          "EWR",
+          124.0
+        ],
+        [
+          "Staten Island",
+          3.35
+        ]
+      ],
+      "actual_rows": [
+        [
+          "Bronx",
+          17.901041666666668
+        ],
+        [
+          "Brooklyn",
+          19.97967032967033
+        ],
+        [
+          "EWR",
+          124.0
+        ],
+        [
+          "Manhattan",
+          14.116312956434149
+        ],
+        [
+          "N/A",
+          82.95
+        ],
+        [
+          "Queens",
+          42.991854945054946
+        ],
+        [
+          "Staten Island",
+          3.35
+        ],
+        [
+          "Unknown",
+          18.256037735849056
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "j08",
+      "passed": true,
+      "question": "Which 5 pairs of pickup zone and drop-off zone have the most trips? Return the pickup zone name, the drop-off zone name and the number of trips, most trips first. Break ties by pickup zone ID, then drop-off zone ID, ascending.",
+      "gold_sql": "SELECT pz.zone, dz.zone, COUNT(*) AS trips FROM trips t JOIN zones pz ON pz.zone_id = t.pu_zone_id JOIN zones dz ON dz.zone_id = t.do_zone_id GROUP BY t.pu_zone_id, t.do_zone_id ORDER BY trips DESC, t.pu_zone_id ASC, t.do_zone_id ASC LIMIT 5",
+      "expected_rows": [
+        [
+          "Upper East Side South",
+          "Upper East Side North",
+          1880
+        ],
+        [
+          "Upper East Side North",
+          "Upper East Side South",
+          1599
+        ],
+        [
+          "Upper East Side North",
+          "Upper East Side North",
+          1327
+        ],
+        [
+          "Upper East Side South",
+          "Upper East Side South",
+          1309
+        ],
+        [
+          "Midtown Center",
+          "Upper East Side South",
+          887
+        ]
+      ],
+      "actual_rows": [
+        [
+          "Upper East Side South",
+          "Upper East Side North",
+          1880
+        ],
+        [
+          "Upper East Side North",
+          "Upper East Side South",
+          1599
+        ],
+        [
+          "Upper East Side North",
+          "Upper East Side North",
+          1327
+        ],
+        [
+          "Upper East Side South",
+          "Upper East Side South",
+          1309
+        ],
+        [
+          "Midtown Center",
+          "Upper East Side South",
+          887
+        ]
+      ],
+      "column_count": 3
+    },
+    {
+      "id": "t01",
+      "passed": true,
+      "question": "How many trips started in each hour of the day? Return the hour as an integer from 0 to 23 and the number of trips.",
+      "gold_sql": "SELECT CAST(strftime('%H', pickup_at) AS INTEGER) AS hour, COUNT(*) FROM trips GROUP BY hour",
+      "expected_rows": [
+        [
+          0,
+          6716
+        ],
+        [
+          23,
+          9088
+        ],
+        [
+          1,
+          4508
+        ],
+        [
+          2,
+          3256
+        ],
+        [
+          3,
+          2207
+        ],
+        [
+          4,
+          1427
+        ],
+        [
+          5,
+          1531
+        ],
+        [
+          6,
+          3430
+        ],
+        [
+          7,
+          6965
+        ],
+        [
+          8,
+          9980
+        ],
+        [
+          9,
+          10909
+        ],
+        [
+          10,
+          11624
+        ],
+        [
+          11,
+          12651
+        ],
+        [
+          12,
+          13862
+        ],
+        [
+          13,
+          14593
+        ],
+        [
+          14,
+          15421
+        ],
+        [
+          15,
+          15925
+        ],
+        [
+          16,
+          15917
+        ],
+        [
+          17,
+          17378
+        ],
+        [
+          22,
+          12256
+        ],
+        [
+          18,
+          17890
+        ],
+        [
+          19,
+          15537
+        ],
+        [
+          20,
+          13308
+        ],
+        [
+          21,
+          13621
+        ]
+      ],
+      "actual_rows": [
+        [
+          0,
+          6716
+        ],
+        [
+          1,
+          4508
+        ],
+        [
+          2,
+          3256
+        ],
+        [
+          3,
+          2207
+        ],
+        [
+          4,
+          1427
+        ],
+        [
+          5,
+          1531
+        ],
+        [
+          6,
+          3430
+        ],
+        [
+          7,
+          6965
+        ],
+        [
+          8,
+          9980
+        ],
+        [
+          9,
+          10909
+        ],
+        [
+          10,
+          11624
+        ],
+        [
+          11,
+          12651
+        ],
+        [
+          12,
+          13862
+        ],
+        [
+          13,
+          14593
+        ],
+        [
+          14,
+          15421
+        ],
+        [
+          15,
+          15925
+        ],
+        [
+          16,
+          15917
+        ],
+        [
+          17,
+          17378
+        ],
+        [
+          18,
+          17890
+        ],
+        [
+          19,
+          15537
+        ],
+        [
+          20,
+          13308
+        ],
+        [
+          21,
+          13621
+        ],
+        [
+          22,
+          12256
+        ],
+        [
+          23,
+          9088
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "t02",
+      "passed": true,
+      "question": "What is the average trip duration in minutes across all trips? Include trips with negative durations.",
+      "gold_sql": "SELECT AVG((julianday(dropoff_at) - julianday(pickup_at)) * 1440) FROM trips",
+      "expected_rows": [
+        [
+          15.629360266666668
+        ]
+      ],
+      "actual_rows": [
+        [
+          15.629360266919733
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "t03",
+      "passed": true,
+      "question": "How many trips were picked up on each date from January 1 to January 7, 2024, inclusive? Return the date as YYYY-MM-DD and the number of trips.",
+      "gold_sql": "SELECT date(pickup_at) AS day, COUNT(*) FROM trips WHERE date(pickup_at) BETWEEN '2024-01-01' AND '2024-01-07' GROUP BY day",
+      "expected_rows": [
+        [
+          "2024-01-01",
+          6880
+        ],
+        [
+          "2024-01-03",
+          6854
+        ],
+        [
+          "2024-01-02",
+          6345
+        ],
+        [
+          "2024-01-04",
+          8576
+        ],
+        [
+          "2024-01-05",
+          8745
+        ],
+        [
+          "2024-01-06",
+          8334
+        ],
+        [
+          "2024-01-07",
+          5620
+        ]
+      ],
+      "actual_rows": [
+        [
+          "2024-01-01",
+          6880
+        ],
+        [
+          "2024-01-02",
+          6345
+        ],
+        [
+          "2024-01-03",
+          6854
+        ],
+        [
+          "2024-01-04",
+          8576
+        ],
+        [
+          "2024-01-05",
+          8745
+        ],
+        [
+          "2024-01-06",
+          8334
+        ],
+        [
+          "2024-01-07",
+          5620
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "t04",
+      "passed": true,
+      "question": "How many trips were picked up on a Saturday or a Sunday?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE strftime('%w', pickup_at) IN ('0', '6')",
+      "expected_rows": [
+        [
+          64334
+        ]
+      ],
+      "actual_rows": [
+        [
+          64334
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "t05",
+      "passed": true,
+      "question": "Which pickup hour of the day has the highest average fare amount? Return the hour as an integer from 0 to 23 and the average fare. Break ties by hour ascending.",
+      "gold_sql": "SELECT CAST(strftime('%H', pickup_at) AS INTEGER) AS hour, AVG(fare_amount) AS avg_fare FROM trips GROUP BY hour ORDER BY avg_fare DESC, hour ASC LIMIT 1",
+      "expected_rows": [
+        [
+          5,
+          25.948497713912477
+        ]
+      ],
+      "actual_rows": [
+        [
+          5,
+          25.948497713912477
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "t06",
+      "passed": true,
+      "question": "How many trips lasted longer than 2 hours? Compare durations in whole seconds.",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE strftime('%s', dropoff_at) - strftime('%s', pickup_at) > 7200",
+      "expected_rows": [
+        [
+          222
+        ]
+      ],
+      "actual_rows": [
+        [
+          222
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "w01",
+      "passed": true,
+      "question": "How many trips had a fare amount above the average fare amount of all trips?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE fare_amount > (SELECT AVG(fare_amount) FROM trips)",
+      "expected_rows": [
+        [
+          74294
+        ]
+      ],
+      "actual_rows": [
+        [
+          74294
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "w02",
+      "passed": true,
+      "question": "For each pickup borough, which pickup zone has the most trips? Return the borough, the zone name and the number of trips. Include placeholder boroughs and break ties by the lowest zone ID.",
+      "gold_sql": "WITH counts AS (SELECT z.zone_id, z.borough, z.zone, COUNT(*) AS trips FROM trips t JOIN zones z ON z.zone_id = t.pu_zone_id GROUP BY z.zone_id, z.borough, z.zone), ranked AS (SELECT borough, zone, trips, ROW_NUMBER() OVER (PARTITION BY borough ORDER BY trips DESC, zone_id ASC) AS rn FROM counts) SELECT borough, zone, trips FROM ranked WHERE rn = 1",
+      "expected_rows": [
+        [
+          "Queens",
+          "JFK Airport",
+          12221
+        ],
+        [
+          "Manhattan",
+          "Midtown Center",
+          12083
+        ],
+        [
+          "Unknown",
+          "N/A",
+          864
+        ],
+        [
+          "N/A",
+          "Outside of NYC",
+          144
+        ],
+        [
+          "Brooklyn",
+          "Downtown Brooklyn/MetroTech",
+          107
+        ],
+        [
+          "Bronx",
+          "Mott Haven/Port Morris",
+          42
+        ],
+        [
+          "EWR",
+          "Newark Airport",
+          22
+        ],
+        [
+          "Staten Island",
+          "Arrochar/Fort Wadsworth",
+          2
+        ]
+      ],
+      "actual_rows": [
+        [
+          "Bronx",
+          "Mott Haven/Port Morris",
+          42
+        ],
+        [
+          "Brooklyn",
+          "Downtown Brooklyn/MetroTech",
+          107
+        ],
+        [
+          "EWR",
+          "Newark Airport",
+          22
+        ],
+        [
+          "Manhattan",
+          "Midtown Center",
+          12083
+        ],
+        [
+          "N/A",
+          "Outside of NYC",
+          144
+        ],
+        [
+          "Queens",
+          "JFK Airport",
+          12221
+        ],
+        [
+          "Staten Island",
+          "Arrochar/Fort Wadsworth",
+          2
+        ],
+        [
+          "Unknown",
+          "N/A",
+          864
+        ]
+      ],
+      "column_count": 3
+    },
+    {
+      "id": "w03",
+      "passed": true,
+      "question": "What percentage of all trips does each payment type code account for? Return the payment type code and the percentage. Express percentages on a 0 to 100 scale.",
+      "gold_sql": "SELECT payment_type, 100.0 * COUNT(*) / (SELECT COUNT(*) FROM trips) FROM trips GROUP BY payment_type",
+      "expected_rows": [
+        [
+          1,
+          78.3504
+        ],
+        [
+          2,
+          14.6932
+        ],
+        [
+          4,
+          1.58
+        ],
+        [
+          3,
+          0.6492
+        ],
+        [
+          0,
+          4.7272
+        ]
+      ],
+      "actual_rows": [
+        [
+          0,
+          4.7272
+        ],
+        [
+          1,
+          78.3504
+        ],
+        [
+          2,
+          14.6932
+        ],
+        [
+          3,
+          0.6492
+        ],
+        [
+          4,
+          1.58
+        ]
+      ],
+      "column_count": 2
+    },
+    {
+      "id": "w04",
+      "passed": true,
+      "question": "Rank the vendors by number of trips. Return the vendor ID, the number of trips and the rank, where rank 1 is the vendor with the most trips.",
+      "gold_sql": "SELECT vendor_id, COUNT(*) AS trips, RANK() OVER (ORDER BY COUNT(*) DESC) AS rnk FROM trips GROUP BY vendor_id",
+      "expected_rows": [
+        [
+          2,
+          188617,
+          1
+        ],
+        [
+          1,
+          61361,
+          2
+        ],
+        [
+          6,
+          22,
+          3
+        ]
+      ],
+      "actual_rows": [
+        [
+          2,
+          188617,
+          1
+        ],
+        [
+          1,
+          61361,
+          2
+        ],
+        [
+          6,
+          22,
+          3
+        ]
+      ],
+      "column_count": 3
+    },
+    {
+      "id": "d01",
+      "passed": true,
+      "question": "How many trips have a drop-off time earlier than their pick-up time?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE dropoff_at < pickup_at",
+      "expected_rows": [
+        [
+          8
+        ]
+      ],
+      "actual_rows": [
+        [
+          8
+        ]
+      ],
+      "column_count": 1
+    },
+    {
+      "id": "d02",
+      "passed": true,
+      "question": "How many trips have a pickup time outside January 2024?",
+      "gold_sql": "SELECT COUNT(*) FROM trips WHERE pickup_at < '2024-01-01' OR pickup_at >= '2024-02-01'",
+      "expected_rows": [
+        [
+          2
+        ]
+      ],
+      "actual_rows": [
+        [
+          2
+        ]
+      ],
+      "column_count": 1
+    }
+  ]
+}
